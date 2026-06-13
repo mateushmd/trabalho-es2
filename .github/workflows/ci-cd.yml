@@ -111,7 +111,7 @@ jobs:
           docker compose up -d
           sleep 20
           # Testa se a API está respondendo
-          curl -f http://localhost:8080/api/contatos || exit 1
+          curl -f http://localhost:8080/api/profissionais || exit 1
           # Testa se o frontend está acessível
           curl -f http://localhost:3000 || exit 1
           echo "✅ Testes de aceitação passaram!"
@@ -127,18 +127,18 @@ jobs:
       - name: 📤 Push imagens para Amazon ECR
         run: |
           aws ecr get-login-password | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-          docker tag clinica-web-backend:latest ${{ secrets.ECR_REGISTRY }}/agenda-backend:latest
-          docker tag clinica-web-frontend:latest ${{ secrets.ECR_REGISTRY }}/agenda-frontend:latest
-          docker push ${{ secrets.ECR_REGISTRY }}/agenda-backend:latest
-          docker push ${{ secrets.ECR_REGISTRY }}/agenda-frontend:latest
+          docker tag trabalho-es2-backend:latest ${{ secrets.ECR_REGISTRY }}/clinica-backend:latest
+          docker tag trabalho-es2-frontend:latest ${{ secrets.ECR_REGISTRY }}/clinica-frontend:latest
+          docker push ${{ secrets.ECR_REGISTRY }}/clinica-backend:latest
+          docker push ${{ secrets.ECR_REGISTRY }}/clinica-frontend:latest
 
       - name: 🚀 Deploy para AWS ECS/EC2
         run: |
-          aws ecs update-service --cluster agenda-cluster --service agenda-backend --force-new-deployment
-          aws ecs update-service --cluster agenda-cluster --service agenda-frontend --force-new-deployment
+          aws ecs update-service --cluster clinica-cluster --service clinica-backend --force-new-deployment
+          aws ecs update-service --cluster clinica-cluster --service clinica-frontend --force-new-deployment
 
       - name: 🏁 Health Check
         run: |
           sleep 30
-          curl -f http://${{ secrets.AWS_APP_URL }}/api/contatos || exit 1
+          curl -f http://${{ secrets.AWS_APP_URL }}/api/profissionais || exit 1
           echo "✅ Aplicação em produção na AWS!"
