@@ -117,28 +117,11 @@ jobs:
           echo "✅ Testes de aceitação passaram!"
           docker compose down
 
-      - name: 🔑 Login no AWS ECR
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: 📤 Push imagens para Amazon ECR
+      - name: 🚀 Disparar Deploy no Render (Backend)
         run: |
-          aws ecr get-login-password | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-          docker tag trabalho-es2-backend:latest ${{ secrets.ECR_REGISTRY }}/clinica-backend:latest
-          docker tag trabalho-es2-frontend:latest ${{ secrets.ECR_REGISTRY }}/clinica-frontend:latest
-          docker push ${{ secrets.ECR_REGISTRY }}/clinica-backend:latest
-          docker push ${{ secrets.ECR_REGISTRY }}/clinica-frontend:latest
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}"
 
-      - name: 🚀 Deploy para AWS ECS/EC2
+      - name: 🚀 Disparar Deploy no Render (Frontend)
         run: |
-          aws ecs update-service --cluster clinica-cluster --service clinica-backend --force-new-deployment
-          aws ecs update-service --cluster clinica-cluster --service clinica-frontend --force-new-deployment
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}"
 
-      - name: 🏁 Health Check
-        run: |
-          sleep 30
-          curl -f http://${{ secrets.AWS_APP_URL }}/api/profissionais || exit 1
-          echo "✅ Aplicação em produção na AWS!"
