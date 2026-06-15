@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Agenda Web (Java + React)
+name: CI/CD Pipeline - Clinica Web (Java + React)
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: agenda_test
+          POSTGRES_DB: clinica_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
@@ -51,7 +51,7 @@ jobs:
         env:
           DB_HOST: localhost
           DB_PORT: 5432
-          DB_NAME: agenda_test
+          DB_NAME: clinica_test
           DB_USER: postgres
           DB_PASSWORD: postgres
 
